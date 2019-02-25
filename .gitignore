@@ -1,0 +1,6 @@
+*~
+*.o
+*.map
+kernel.bin
+test
+fs

@@ -19,9 +19,7 @@ struct __attribute__((packed)) platform_info {
 
 #define INIT_APP	"test"
 
-
-/* PCIの定義 */
-#define PCI_CONF_DID_VID	0x00
+#define PCI_CONF_BAR	0x10
 
 #define CONFIG_ADDRESS	0x0cf8
 #define CONFIG_DATA	0x0cfc
@@ -37,13 +35,6 @@ union pci_config_address {
 		unsigned int enable_bit:1;
 	};
 };
-
-
-/* NICの定義 */
-#define NIC_BUS_NUM	0x00
-#define NIC_DEV_NUM	0x19
-#define NIC_FUNC_NUM	0x0
-
 
 void start_kernel(void *_t __attribute__((unused)), struct platform_info *pi,
 		  void *_fs_start)
@@ -66,24 +57,14 @@ void start_kernel(void *_t __attribute__((unused)), struct platform_info *pi,
 	hpet_init();
 	kbc_init();
 
-
-
-	/* NICのベンダーID・デバイスIDを取得 */
-
-	/* CONFIG_ADDRESSを設定 */
+	/* BARを取得 */
 	union pci_config_address conf_addr;
 	conf_addr.raw = 0;
-	conf_addr.bus_num = NIC_BUS_NUM;
-	conf_addr.dev_num = NIC_DEV_NUM;
-	conf_addr.func_num = NIC_FUNC_NUM;
-	conf_addr.reg_addr = PCI_CONF_DID_VID;
+	conf_addr.dev_num = 0x19;
 	conf_addr.enable_bit = 1;
+	conf_addr.reg_addr = PCI_CONF_BAR;
 	io_write32(CONFIG_ADDRESS, conf_addr.raw);
-
-	/* CONFIG_DATAを読み出す */
 	unsigned int conf_data = io_read32(CONFIG_DATA);
-
-	/* 読み出したデータからベンダーID・デバイスIDを取得 */
 	unsigned short vendor_id = conf_data & 0x0000ffff;
 	unsigned short device_id = conf_data >> 16;
 	puth(vendor_id, 4);
@@ -93,8 +74,6 @@ void start_kernel(void *_t __attribute__((unused)), struct platform_info *pi,
 	/* haltして待つ */
 	while (1)
 		cpu_halt();
-
-
 
 	/* システムコールの初期化 */
 	syscall_init();

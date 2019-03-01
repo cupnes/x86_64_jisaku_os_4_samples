@@ -44,7 +44,7 @@ void start_kernel(void *_t __attribute__((unused)), struct platform_info *pi,
 
 
 
-	/* NICのベンダーID・デバイスIDを取得 */
+	/* PCIコンフィグレーション空間のレジスタを読み出す */
 	unsigned int conf_data = get_pci_conf_reg(
 		NIC_BUS_NUM, NIC_DEV_NUM, NIC_FUNC_NUM, PCI_CONF_DID_VID);
 

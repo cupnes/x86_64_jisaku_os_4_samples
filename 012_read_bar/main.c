@@ -11,6 +11,8 @@
 #include <common.h>
 #include <syscall.h>
 #include <proc.h>
+#include <pci.h>
+#include <nic.h>
 
 struct __attribute__((packed)) platform_info {
 	struct framebuffer fb;
@@ -18,23 +20,6 @@ struct __attribute__((packed)) platform_info {
 };
 
 #define INIT_APP	"test"
-
-#define PCI_CONF_BAR	0x10
-
-#define CONFIG_ADDRESS	0x0cf8
-#define CONFIG_DATA	0x0cfc
-
-union pci_config_address {
-	unsigned int raw;
-	struct __attribute__((packed)) {
-		unsigned int reg_addr:8;
-		unsigned int func_num:3;
-		unsigned int dev_num:5;
-		unsigned int bus_num:8;
-		unsigned int _reserved:7;
-		unsigned int enable_bit:1;
-	};
-};
 
 void start_kernel(void *_t __attribute__((unused)), struct platform_info *pi,
 		  void *_fs_start)
@@ -57,23 +42,63 @@ void start_kernel(void *_t __attribute__((unused)), struct platform_info *pi,
 	hpet_init();
 	kbc_init();
 
-	/* BARを取得 */
-	union pci_config_address conf_addr;
-	conf_addr.raw = 0;
-	conf_addr.dev_num = 0x19;
-	conf_addr.enable_bit = 1;
-	conf_addr.reg_addr = PCI_CONF_BAR;
-	io_write32(CONFIG_ADDRESS, conf_addr.raw);
-	unsigned int conf_data = io_read32(CONFIG_DATA);
-	unsigned short vendor_id = conf_data & 0x0000ffff;
-	unsigned short device_id = conf_data >> 16;
-	puth(vendor_id, 4);
+
+
+	/* NICのベンダーID・デバイスIDを取得 */
+	unsigned int bar = get_pci_conf_reg(
+		NIC_BUS_NUM, NIC_DEV_NUM, NIC_FUNC_NUM, PCI_CONF_BAR);
+	puts("BAR ");
+	puth(bar, 8);
 	puts("\r\n");
-	puth(device_id, 4);
+
+	/* BARのタイプを確認しNICのレジスタのベースアドレスを取得 */
+	if (bar & PCI_BAR_MASK_IO) {
+		/* IO空間用ベースアドレス */
+		puts("IO BASE ");
+		puth(bar & PCI_BAR_MASK_IO_ADDR, 8);
+		puts("\r\n");
+	} else {
+		/* メモリ空間用ベースアドレス */
+		unsigned int bar_32;
+		unsigned long long bar_upper;
+		unsigned long long bar_64;
+		switch (bar & PCI_BAR_MASK_MEM_TYPE) {
+		case PCI_BAR_MEM_TYPE_32BIT:
+			puts("MEM BASE 32BIT ");
+			bar_32 = bar & PCI_BAR_MASK_MEM_ADDR;
+			puth(bar_32, 8);
+			puts("\r\n");
+			break;
+
+		case PCI_BAR_MEM_TYPE_1M:
+			puts("MEM BASE 1M ");
+			bar_32 = bar & PCI_BAR_MASK_MEM_ADDR;
+			puth(bar_32, 8);
+			puts("\r\n");
+			break;
+
+		case PCI_BAR_MEM_TYPE_64BIT:
+			bar_upper = get_pci_conf_reg(
+				NIC_BUS_NUM, NIC_DEV_NUM, NIC_FUNC_NUM,
+				PCI_CONF_BAR + 4);
+			bar_64 = (bar_upper << 32)
+				+ (bar & PCI_BAR_MASK_MEM_ADDR);
+			puts("MEM BASE 64BIT ");
+			puth(bar_64, 16);
+			puts("\r\n");
+			break;
+		}
+		if (bar & PCI_BAR_MASK_MEM_PREFETCHABLE)
+			puts("PREFETCHABLE\r\n");
+		else
+			puts("NON PREFETCHABLE\r\n");
+	}
 
 	/* haltして待つ */
 	while (1)
 		cpu_halt();
+
+
 
 	/* システムコールの初期化 */
 	syscall_init();

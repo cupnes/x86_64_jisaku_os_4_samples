@@ -51,9 +51,14 @@ void start_kernel(void *_t __attribute__((unused)), struct platform_info *pi,
 	/* 読み出したデータからベンダーID・デバイスIDを取得 */
 	unsigned short vendor_id = conf_data & 0x0000ffff;
 	unsigned short device_id = conf_data >> 16;
+
+	/* 表示 */
+	puts("VENDOR ID ");
 	puth(vendor_id, 4);
 	puts("\r\n");
+	puts("DEVICE ID ");
 	puth(device_id, 4);
+	puts("\r\n");
 
 	/* haltして待つ */
 	while (1)

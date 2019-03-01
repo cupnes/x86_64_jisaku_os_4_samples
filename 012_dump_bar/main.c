@@ -44,7 +44,7 @@ void start_kernel(void *_t __attribute__((unused)), struct platform_info *pi,
 
 
 
-	/* NICのベンダーID・デバイスIDを取得 */
+	/* PCIコンフィグレーション空間からBARを取得 */
 	unsigned int bar = get_pci_conf_reg(
 		NIC_BUS_NUM, NIC_DEV_NUM, NIC_FUNC_NUM, PCI_CONF_BAR);
 	puts("BAR ");

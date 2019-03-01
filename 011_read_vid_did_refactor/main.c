@@ -11,6 +11,8 @@
 #include <common.h>
 #include <syscall.h>
 #include <proc.h>
+#include <pci.h>
+#include <nic.h>
 
 struct __attribute__((packed)) platform_info {
 	struct framebuffer fb;
@@ -18,16 +20,6 @@ struct __attribute__((packed)) platform_info {
 };
 
 #define INIT_APP	"test"
-
-
-/* PCIの定義 */
-
-
-/* NICの定義 */
-#define NIC_BUS_NUM	0x00
-#define NIC_DEV_NUM	0x19
-#define NIC_FUNC_NUM	0x0
-
 
 void start_kernel(void *_t __attribute__((unused)), struct platform_info *pi,
 		  void *_fs_start)
@@ -53,8 +45,8 @@ void start_kernel(void *_t __attribute__((unused)), struct platform_info *pi,
 
 
 	/* NICのベンダーID・デバイスIDを取得 */
-
-
+	unsigned int conf_data = get_pci_conf_reg(
+		NIC_BUS_NUM, NIC_DEV_NUM, NIC_FUNC_NUM, PCI_CONF_DID_VID);
 
 	/* 読み出したデータからベンダーID・デバイスIDを取得 */
 	unsigned short vendor_id = conf_data & 0x0000ffff;

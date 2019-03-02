@@ -44,21 +44,8 @@ void start_kernel(void *_t __attribute__((unused)), struct platform_info *pi,
 
 
 
-	/* PCIコンフィグレーション空間のレジスタを読み出す */
-	unsigned int conf_data = get_pci_conf_reg(
-		NIC_BUS_NUM, NIC_DEV_NUM, NIC_FUNC_NUM, PCI_CONF_DID_VID);
-
-	/* 読み出したデータからベンダーID・デバイスIDを取得 */
-	unsigned short vendor_id = conf_data & 0x0000ffff;
-	unsigned short device_id = conf_data >> 16;
-
-	/* 表示 */
-	puts("VENDOR ID ");
-	puth(vendor_id, 4);
-	puts("\r\n");
-	puts("DEVICE ID ");
-	puth(device_id, 4);
-	puts("\r\n");
+	/* NICのベンダーIDとデバイスIDをダンプ */
+	dump_vid_did(NIC_BUS_NUM, NIC_DEV_NUM, NIC_FUNC_NUM);
 
 	/* haltして待つ */
 	while (1)

@@ -1,4 +1,6 @@
 #include <x86.h>
+#include <pci.h>
+#include <fbcon.h>
 
 #define CONFIG_ADDRESS	0x0cf8
 #define CONFIG_DATA	0x0cfc
@@ -31,4 +33,23 @@ unsigned int get_pci_conf_reg(
 
 	/* CONFIG_DATAを読み出す */
 	return io_read32(CONFIG_DATA);
+}
+
+void dump_vid_did(unsigned char bus, unsigned char dev, unsigned char func)
+{
+	/* PCIコンフィグレーション空間のレジスタを読み出す */
+	unsigned int conf_data = get_pci_conf_reg(
+		bus, dev, func, PCI_CONF_DID_VID);
+
+	/* 読み出したデータからベンダーID・デバイスIDを取得 */
+	unsigned short vendor_id = conf_data & 0x0000ffff;
+	unsigned short device_id = conf_data >> 16;
+
+	/* 表示 */
+	puts("VENDOR ID ");
+	puth(vendor_id, 4);
+	puts("\r\n");
+	puts("DEVICE ID ");
+	puth(device_id, 4);
+	puts("\r\n");
 }

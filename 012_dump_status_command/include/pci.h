@@ -33,3 +33,5 @@ unsigned int get_pci_conf_reg(
 	unsigned char bus, unsigned char dev, unsigned char func,
 	unsigned char reg);
 void dump_vid_did(unsigned char bus, unsigned char dev, unsigned char func);
+void dump_command_status(
+	unsigned char bus, unsigned char dev, unsigned char func);

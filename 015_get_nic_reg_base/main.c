@@ -41,6 +41,7 @@ void start_kernel(void *_t __attribute__((unused)), struct platform_info *pi,
 	pic_init();
 	hpet_init();
 	kbc_init();
+	nic_init();
 
 
 

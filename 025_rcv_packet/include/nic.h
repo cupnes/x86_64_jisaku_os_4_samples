@@ -6,6 +6,8 @@
 
 #define NIC_REG_IMS	0x00d0
 #define NIC_REG_IMC	0x00d8
+#define NIC_REG_RDBAL	0x2800
+#define NIC_REG_RDBAH	0x2804
 
 void nic_init(void);
 unsigned int get_nic_reg_base(void);

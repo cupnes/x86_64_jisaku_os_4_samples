@@ -71,7 +71,19 @@ static void rx_init(void)
 		rxdesc++;
 	}
 
-	/* set_nic_reg() */
+	puts("RXDESC_ADDR ");
+	puth(rxdesc_addr, 16);
+	puts("\r\n");
+
+	set_nic_reg(NIC_REG_RDBAH, rxdesc_addr >> 32);
+	set_nic_reg(NIC_REG_RDBAL, rxdesc_addr & 0x00000000ffffffff);
+
+	puts("RDBAH ");
+	puth(get_nic_reg(NIC_REG_RDBAH), 8);
+	puts("\r\n");
+	puts("RDBAL ");
+	puth(get_nic_reg(NIC_REG_RDBAL), 8);
+	puts("\r\n");
 }
 
 void nic_init(void)

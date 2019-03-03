@@ -21,6 +21,7 @@ static unsigned char rx_buffer[RXDESC_NUM][BUFFER_SIZE];
 static unsigned char rxdesc_data[
 	(sizeof(struct rxdesc) * RXDESC_NUM) + ALIGN_MARGIN];
 static struct rxdesc *rxdesc;
+static unsigned short current_rx_idx;
 
 static void disable_nic_interrupt(void)
 {
@@ -71,18 +72,35 @@ static void rx_init(void)
 		rxdesc++;
 	}
 
-	puts("RXDESC_ADDR ");
-	puth(rxdesc_addr, 16);
-	puts("\r\n");
+	/* puts("RXDESC_ADDR "); */
+	/* puth(rxdesc_addr, 16); */
+	/* puts("\r\n"); */
 
 	set_nic_reg(NIC_REG_RDBAH, rxdesc_addr >> 32);
 	set_nic_reg(NIC_REG_RDBAL, rxdesc_addr & 0x00000000ffffffff);
 
-	puts("RDBAH ");
-	puth(get_nic_reg(NIC_REG_RDBAH), 8);
+	/* puts("RDBAH "); */
+	/* puth(get_nic_reg(NIC_REG_RDBAH), 8); */
+	/* puts("\r\n"); */
+	/* puts("RDBAL "); */
+	/* puth(get_nic_reg(NIC_REG_RDBAL), 8); */
+	/* puts("\r\n"); */
+
+	set_nic_reg(NIC_REG_RDLEN, sizeof(struct rxdesc) * RXDESC_NUM);
+
+	puts("RDLEN ");
+	puth(get_nic_reg(NIC_REG_RDLEN), 8);
 	puts("\r\n");
-	puts("RDBAL ");
-	puth(get_nic_reg(NIC_REG_RDBAL), 8);
+
+	current_rx_idx = 0;
+	set_nic_reg(NIC_REG_RDH, current_rx_idx);
+	set_nic_reg(NIC_REG_RDT, RXDESC_NUM - 1);
+
+	puts("RDH ");
+	puth(get_nic_reg(NIC_REG_RDH), 8);
+	puts("\r\n");
+	puts("RDT ");
+	puth(get_nic_reg(NIC_REG_RDT), 8);
 	puts("\r\n");
 }
 

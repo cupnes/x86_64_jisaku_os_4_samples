@@ -105,9 +105,9 @@ static void rx_init(void)
 
 	set_nic_reg(NIC_REG_RCTL, NIC_RCTL_BSIZE_256B | NIC_RCTL_BAM
 		    | NIC_RCTL_MPE | NIC_RCTL_UPE | NIC_RCTL_SBP | NIC_RCTL_EN);
-	puts("RCTL ");
-	puth(get_nic_reg(NIC_REG_RCTL), 8);
-	puts("\r\n");
+	/* puts("RCTL "); */
+	/* puth(get_nic_reg(NIC_REG_RCTL), 8); */
+	/* puts("\r\n"); */
 }
 
 void nic_init(void)
@@ -151,4 +151,15 @@ void dump_nic_ims(void)
 	puts("IMS ");
 	puth(ims, 8);
 	puts("\r\n");
+}
+
+unsigned int rcv_packet(void *buf)
+{
+	if (rxdesc[current_rx_idx]->status & NIC_RDESC_STAT_DD) {
+		memcpy(buf, (void *)rxdesc[current_rx_idx]->buffer_address,
+		       rxdesc[current_rx_idx]->length);
+		rxdesc[current_rx_idx]->status = 0;
+
+		/* TBD */
+	}
 }

@@ -43,6 +43,14 @@
 #define NIC_RCTL_BSEX	(1U << 25)
 #define NIC_RCTL_SECRC	(1U << 26)
 
+#define NIC_RDESC_STAT_DD	(1U << 0)
+#define NIC_RDESC_STAT_EOP	(1U << 1)
+#define NIC_RDESC_STAT_IXSM	(1U << 2)
+#define NIC_RDESC_STAT_VP	(1U << 3)
+#define NIC_RDESC_STAT_TCPCS	(1U << 5)
+#define NIC_RDESC_STAT_IPCS	(1U << 6)
+#define NIC_RDESC_STAT_PIF	(1U << 7)
+
 void nic_init(void);
 unsigned int get_nic_reg_base(void);
 unsigned int get_nic_reg(unsigned short reg);

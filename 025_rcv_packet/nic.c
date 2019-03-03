@@ -88,19 +88,25 @@ static void rx_init(void)
 
 	set_nic_reg(NIC_REG_RDLEN, sizeof(struct rxdesc) * RXDESC_NUM);
 
-	puts("RDLEN ");
-	puth(get_nic_reg(NIC_REG_RDLEN), 8);
-	puts("\r\n");
+	/* puts("RDLEN "); */
+	/* puth(get_nic_reg(NIC_REG_RDLEN), 8); */
+	/* puts("\r\n"); */
 
 	current_rx_idx = 0;
 	set_nic_reg(NIC_REG_RDH, current_rx_idx);
 	set_nic_reg(NIC_REG_RDT, RXDESC_NUM - 1);
 
-	puts("RDH ");
-	puth(get_nic_reg(NIC_REG_RDH), 8);
-	puts("\r\n");
-	puts("RDT ");
-	puth(get_nic_reg(NIC_REG_RDT), 8);
+	/* puts("RDH "); */
+	/* puth(get_nic_reg(NIC_REG_RDH), 8); */
+	/* puts("\r\n"); */
+	/* puts("RDT "); */
+	/* puth(get_nic_reg(NIC_REG_RDT), 8); */
+	/* puts("\r\n"); */
+
+	set_nic_reg(NIC_REG_RCTL, NIC_RCTL_BSIZE_256B | NIC_RCTL_BAM
+		    | NIC_RCTL_MPE | NIC_RCTL_UPE | NIC_RCTL_SBP | NIC_RCTL_EN);
+	puts("RCTL ");
+	puth(get_nic_reg(NIC_REG_RCTL), 8);
 	puts("\r\n");
 }
 

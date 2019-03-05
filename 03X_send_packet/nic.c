@@ -5,7 +5,7 @@
 #include <common.h>
 
 #define RXDESC_NUM	80
-#define TXDESC_NUM	80
+#define TXDESC_NUM	8
 #define ALIGN_MARGIN	16
 
 struct __attribute__((packed)) rxdesc {
@@ -36,7 +36,6 @@ static unsigned char rxdesc_data[
 static struct rxdesc *rxdesc_base;
 static unsigned short current_rx_idx;
 
-static unsigned char tx_buffer[TXDESC_NUM][PACKET_BUFFER_SIZE];
 static unsigned char txdesc_data[
 	(sizeof(struct txdesc) * TXDESC_NUM) + ALIGN_MARGIN];
 static struct txdesc *txdesc_base;
@@ -219,4 +218,25 @@ unsigned short dump_packet(void)
 		puts("\r\n");
 
 	return len;
+}
+
+unsigned char send_packet(void *buf, unsigned short len)
+{
+	/* txdescの設定 */
+	struct txdesc *cur_txdesc = txdesc_base + current_tx_idx;
+	cur_txdesc->buffer_address = (unsigned long long)buf;
+	cur_txdesc->length = len;
+	cur_txdesc->sta = 0;
+
+	/* idx更新 */
+	current_tx_idx = (current_tx_idx + 1) % TXDESC_NUM;
+	set_nic_reg(NIC_REG_TDT, current_tx_idx);
+
+	/* 送信完了を待つ */
+	unsigned char send_status;
+	while (1) {
+		send_status = cur_txdesc->sta & 0x0f;
+		if (send_status)
+			return send_status;
+	}
 }

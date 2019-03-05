@@ -89,3 +89,4 @@ void set_nic_reg(unsigned short reg, unsigned int val);
 void dump_nic_ims(void);
 unsigned short receive_packet(void *buf);
 unsigned short dump_packet(void);
+unsigned char send_packet(void *buf, unsigned short len);

@@ -45,9 +45,30 @@ void start_kernel(void *_t __attribute__((unused)), struct platform_info *pi,
 
 
 
-	/* haltして待つ */
-	while (1)
-		cpu_halt();
+	/* 1秒周期で0xbeefbeefを送信し続ける */
+	unsigned int data = 0xbeefbeef;
+	unsigned short len = sizeof(data);
+	while (1) {
+		puts("BE");
+		unsigned char status = send_packet(&data, len);
+		switch (status) {
+		case NIC_TDESC_STA_DD:
+			puts("EF");
+			break;
+		case NIC_TDESC_STA_EC:
+			puts("EC");
+			break;
+		case NIC_TDESC_STA_LC:
+			puts("LC");
+			break;
+		case NIC_TDESC_STA_TU:
+			puts("TU");
+			break;
+		}
+		putc(' ');
+
+		sleep(1 * SEC_TO_US);
+	}
 
 
 

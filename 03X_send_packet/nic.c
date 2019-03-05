@@ -129,8 +129,8 @@ static void tx_init(void)
 	set_nic_reg(NIC_REG_TDT, current_tx_idx);
 
 	/* NICの送信動作設定 */
-	set_nic_reg(NIC_REG_TCTL, PACKET_BUFFER_BIT | NIC_RCTL_BAM
-		    | NIC_RCTL_MPE | NIC_RCTL_UPE | NIC_RCTL_SBP | NIC_RCTL_EN);
+	set_nic_reg(NIC_REG_TCTL, (0x40 << NIC_TCTL_COLD_SHIFT)
+		    | (0x0f << NIC_TCTL_CT_SHIFT) | NIC_TCTL_PSP | NIC_TCTL_EN);
 }
 
 void nic_init(void)

@@ -49,6 +49,14 @@
 #define NIC_RCTL_BSEX	(1U << 25)
 #define NIC_RCTL_SECRC	(1U << 26)
 
+#define NIC_TCTL_EN	(1U << 1)
+#define NIC_TCTL_PSP	(1U << 3)
+#define NIC_TCTL_CT_SHIFT	4
+#define NIC_TCTL_COLD_SHIFT	12
+#define NIC_TCTL_SWXOFF	(1U << 22)
+#define NIC_TCTL_RTLC	(1U << 24)
+#define NIC_TCTL_NRTU	(1U << 25)
+
 #define NIC_RDESC_STAT_DD	(1U << 0)
 #define NIC_RDESC_STAT_EOP	(1U << 1)
 #define NIC_RDESC_STAT_IXSM	(1U << 2)

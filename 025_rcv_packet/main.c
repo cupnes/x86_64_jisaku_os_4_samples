@@ -45,7 +45,12 @@ void start_kernel(void *_t __attribute__((unused)), struct platform_info *pi,
 
 
 
-	/* haltして待つ */
+	/* 受信したパケット(イーサネットフレーム)をダンプし続ける */
+	unsigned int i;
+	for (i = 0; i < 3; i++) {
+		dump_packet(i);
+		puts("\r\n");
+	}
 	while (1)
 		cpu_halt();
 

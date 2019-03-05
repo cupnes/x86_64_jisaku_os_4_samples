@@ -51,8 +51,14 @@
 #define NIC_RDESC_STAT_IPCS	(1U << 6)
 #define NIC_RDESC_STAT_PIF	(1U << 7)
 
+#define PACKET_BUFFER_SIZE	2048
+#define PACKET_BUFFER_BIT	NIC_RCTL_BSIZE_2048B
+
 void nic_init(void);
 unsigned int get_nic_reg_base(void);
 unsigned int get_nic_reg(unsigned short reg);
 void set_nic_reg(unsigned short reg, unsigned int val);
 void dump_nic_ims(void);
+unsigned short receive_packet(void *buf);
+/* void dump_packet(void); */
+void dump_packet(unsigned int rx_idx);

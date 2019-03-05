@@ -2,10 +2,10 @@
 #include <pci.h>
 #include <nic.h>
 #include <fbcon.h>
+#include <common.h>
 
-#define RXDESC_NUM	8
+#define RXDESC_NUM	80
 #define ALIGN_MARGIN	16
-#define BUFFER_SIZE	256
 
 struct __attribute__((packed)) rxdesc {
 	unsigned long long buffer_address;
@@ -17,10 +17,10 @@ struct __attribute__((packed)) rxdesc {
 };
 
 static unsigned int nic_reg_base;
-static unsigned char rx_buffer[RXDESC_NUM][BUFFER_SIZE];
+static unsigned char rx_buffer[RXDESC_NUM][PACKET_BUFFER_SIZE];
 static unsigned char rxdesc_data[
 	(sizeof(struct rxdesc) * RXDESC_NUM) + ALIGN_MARGIN];
-static struct rxdesc *rxdesc;
+static struct rxdesc *rxdesc_base;
 static unsigned short current_rx_idx;
 
 static void disable_nic_interrupt(void)
@@ -58,23 +58,23 @@ static void rx_init(void)
 	/* return; */
 
 	/* rxdescの初期化 */
-	rxdesc = (struct rxdesc *)rxdesc_addr;
+	rxdesc_base = (struct rxdesc *)rxdesc_addr;
+	puts("RXDESC_BASE ");
+	puth((unsigned long long)rxdesc_base, 16);
+	puts("\r\n");
+	struct rxdesc *cur_rxdesc = rxdesc_base;
 	for (i = 0; i < RXDESC_NUM; i++) {
 		/* puts("RXDESC "); */
-		/* puth((unsigned long long)rxdesc, 16); */
+		/* puth((unsigned long long)cur_rxdesc, 16); */
 		/* puts("\r\n"); */
-		rxdesc->buffer_address = (unsigned long long)rx_buffer[i];
+		cur_rxdesc->buffer_address = (unsigned long long)rx_buffer[i];
 		/* puts("BUFFER "); */
-		/* puth(rxdesc->buffer_address, 16); */
+		/* puth(cur_rxdesc->buffer_address, 16); */
 		/* puts("\r\n"); */
-		rxdesc->status = 0;
-		rxdesc->errors = 0;
-		rxdesc++;
+		cur_rxdesc->status = 0;
+		cur_rxdesc->errors = 0;
+		cur_rxdesc++;
 	}
-
-	/* puts("RXDESC_ADDR "); */
-	/* puth(rxdesc_addr, 16); */
-	/* puts("\r\n"); */
 
 	set_nic_reg(NIC_REG_RDBAH, rxdesc_addr >> 32);
 	set_nic_reg(NIC_REG_RDBAL, rxdesc_addr & 0x00000000ffffffff);
@@ -103,11 +103,16 @@ static void rx_init(void)
 	/* puth(get_nic_reg(NIC_REG_RDT), 8); */
 	/* puts("\r\n"); */
 
-	set_nic_reg(NIC_REG_RCTL, NIC_RCTL_BSIZE_256B | NIC_RCTL_BAM
+	set_nic_reg(NIC_REG_RCTL, PACKET_BUFFER_BIT | NIC_RCTL_BAM
 		    | NIC_RCTL_MPE | NIC_RCTL_UPE | NIC_RCTL_SBP | NIC_RCTL_EN);
 	/* puts("RCTL "); */
 	/* puth(get_nic_reg(NIC_REG_RCTL), 8); */
 	/* puts("\r\n"); */
+
+	/* DEBUG */
+	rx_buffer[0][0] = 0x01;
+	rx_buffer[1][0] = 0x02;
+	rx_buffer[2][0] = 0x03;
 }
 
 void nic_init(void)
@@ -153,13 +158,52 @@ void dump_nic_ims(void)
 	puts("\r\n");
 }
 
-unsigned int rcv_packet(void *buf)
+unsigned short receive_packet(void *buf)
 {
-	if (rxdesc[current_rx_idx]->status & NIC_RDESC_STAT_DD) {
-		memcpy(buf, (void *)rxdesc[current_rx_idx]->buffer_address,
-		       rxdesc[current_rx_idx]->length);
-		rxdesc[current_rx_idx]->status = 0;
+	unsigned short len = 0;
 
-		/* TBD */
+	struct rxdesc *cur_rxdesc = rxdesc_base + current_rx_idx;
+	puts("CUR_RXDESC ");
+	puth((unsigned long long)cur_rxdesc, 16);
+	puts("\r\n");
+	if (1 || cur_rxdesc->status & NIC_RDESC_STAT_DD) {
+		puts("CUR BUFFER_ADDRESS ");
+		puth(cur_rxdesc->buffer_address, 16);
+		puts("\r\n");
+
+		len = cur_rxdesc->length;
+		/* memcpy(buf, (void *)cur_rxdesc->buffer_address, */
+		/*        cur_rxdesc->length); */
+		memcpy(buf, (void *)cur_rxdesc->buffer_address, 256);
+
+		cur_rxdesc->status = 0;
+
+		set_nic_reg(NIC_REG_RDT, current_rx_idx);
+
+		current_rx_idx = (current_rx_idx + 1) % RXDESC_NUM;
 	}
+
+	return len;
+}
+
+void dump_packet(unsigned int rx_idx)
+{
+	current_rx_idx = rx_idx;
+
+	unsigned char buf[PACKET_BUFFER_SIZE];
+	unsigned short len;
+	len = receive_packet(buf);
+	len = 256;
+
+	unsigned short i;
+	for (i = 0; i < len; i++) {
+		puth(buf[i], 2);
+		putc(' ');
+
+		if (((i + 1) % 24) == 0)
+			puts("\r\n");
+		else if (((i + 1) % 4) == 0)
+			putc(' ');
+	}
+	puts("\r\n");
 }

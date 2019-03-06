@@ -109,7 +109,7 @@ static void tx_init(void)
 		cur_txdesc->buffer_address = 0;
 		cur_txdesc->length = 0;
 		cur_txdesc->cso = 0;
-		cur_txdesc->cmd = NIC_TDESC_CMD_RS;
+		cur_txdesc->cmd = NIC_TDESC_CMD_RS | NIC_TDESC_CMD_EOP;
 		cur_txdesc->sta = 0;
 		cur_txdesc->_rsv = 0;
 		cur_txdesc->css = 0;

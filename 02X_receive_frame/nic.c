@@ -120,7 +120,7 @@ void dump_nic_ims(void)
 	puts("\r\n");
 }
 
-unsigned short receive_packet(void *buf)
+unsigned short receive_frame(void *buf)
 {
 	unsigned short len = 0;
 
@@ -140,11 +140,11 @@ unsigned short receive_packet(void *buf)
 	return len;
 }
 
-unsigned short dump_packet(void)
+unsigned short dump_frame(void)
 {
 	unsigned char buf[PACKET_BUFFER_SIZE];
 	unsigned short len;
-	len = receive_packet(buf);
+	len = receive_frame(buf);
 
 	unsigned short i;
 	for (i = 0; i < len; i++) {

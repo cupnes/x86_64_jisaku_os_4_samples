@@ -45,9 +45,9 @@ void start_kernel(void *_t __attribute__((unused)), struct platform_info *pi,
 
 
 
-	/* 受信したパケット(イーサネットフレーム)をダンプし続ける */
+	/* 受信したフレームをダンプし続ける */
 	while (1) {
-		if (dump_packet() > 0)
+		if (dump_frame() > 0)
 			puts("\r\n");
 	}
 

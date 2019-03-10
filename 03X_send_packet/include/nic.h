@@ -80,7 +80,7 @@
 #define NIC_TDESC_STA_TU	(1U << 3)
 
 #define PACKET_BUFFER_SIZE	1024
-#define PACKET_BUFFER_BIT	NIC_RCTL_BSIZE_1024B
+#define PACKET_RBSIZE_BIT	NIC_RCTL_BSIZE_1024B
 
 void nic_init(void);
 unsigned int get_nic_reg_base(void);

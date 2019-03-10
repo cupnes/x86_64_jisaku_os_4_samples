@@ -90,7 +90,7 @@ static void rx_init(void)
 	set_nic_reg(NIC_REG_RDT, RXDESC_NUM - 1);
 
 	/* NICの受信動作設定 */
-	set_nic_reg(NIC_REG_RCTL, PACKET_BUFFER_BIT | NIC_RCTL_BAM
+	set_nic_reg(NIC_REG_RCTL, PACKET_RBSIZE_BIT | NIC_RCTL_BAM
 		    | NIC_RCTL_MPE | NIC_RCTL_UPE | NIC_RCTL_SBP | NIC_RCTL_EN);
 }
 

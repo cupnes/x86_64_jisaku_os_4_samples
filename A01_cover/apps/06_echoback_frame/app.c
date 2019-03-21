@@ -14,8 +14,7 @@ int main(void)
 		/* 受信 */
 		while (!(len = receive_frame(buf)));
 		dump_frame(buf, len);
-		puts("__DUMPED\r\n");
-		/* puts("__RECEIVED\r\n"); */
+		puts("__RECEIVED\r\n");
 
 		/* 送信 */
 		buf_s[0] = 0xbe;

@@ -222,10 +222,6 @@ unsigned short dump_frame(void)
 
 unsigned char send_frame(void *buf, unsigned short len)
 {
-	puts("B_SEND_FRAME ");
-	puth(current_tx_idx, 4);
-	puts("\r\n");
-
 	/* txdescの設定 */
 	struct txdesc *cur_txdesc = txdesc_base + current_tx_idx;
 	cur_txdesc->buffer_address = (unsigned long long)buf;
@@ -240,10 +236,6 @@ unsigned char send_frame(void *buf, unsigned short len)
 	unsigned char send_status = 0;
 	while (!send_status)
 		send_status = cur_txdesc->sta & 0x0f;
-
-	puts("E_SEND_FRAME ");
-	puth(current_tx_idx, 4);
-	puts("\r\n");
 
 	return send_status;
 }

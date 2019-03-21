@@ -4,3 +4,7 @@
 kernel.bin
 test
 fs
+GPATH
+GRTAGS
+GSYMS
+GTAGS

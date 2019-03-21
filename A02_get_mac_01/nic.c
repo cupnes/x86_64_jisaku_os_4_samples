@@ -8,6 +8,8 @@
 #define TXDESC_NUM	8
 #define ALIGN_MARGIN	16
 
+unsigned char nic_mac_addr[6] = { 0 };
+
 struct __attribute__((packed)) rxdesc {
 	unsigned long long buffer_address;
 	unsigned short length;
@@ -85,14 +87,35 @@ static int get_eeprom_data(unsigned char eeprom_addr)
 	return -1;
 }
 
+static void get_mac_addr_eeprom(void)
+{
+	unsigned short mac_1_0 = (unsigned short)get_eeprom_data(0x00);
+	unsigned short mac_3_2 = (unsigned short)get_eeprom_data(0x01);
+	unsigned short mac_5_4 = (unsigned short)get_eeprom_data(0x02);
+
+	nic_mac_addr[0] = mac_1_0 & 0x00ff;
+	nic_mac_addr[1] = mac_1_0 >> 8;
+	nic_mac_addr[2] = mac_3_2 & 0x00ff;
+	nic_mac_addr[3] = mac_3_2 >> 8;
+	nic_mac_addr[4] = mac_5_4 & 0x00ff;
+	nic_mac_addr[5] = mac_5_4 >> 8;
+}
+
 static void get_mac_addr(void)
 {
 	unsigned char eeprom_accessible = get_eeprom_data(0x00) >= 0;
 
 	if (eeprom_accessible) {
 		puts("EEPROM ACCESSIBLE\r\n");
+		get_mac_addr_eeprom();
 	} else {
 		puts("EEPROM NOT ACCESSIBLE\r\n");
+	}
+
+	unsigned char i;
+	for (i = 0; i < 6; i++) {
+		puth(nic_mac_addr[i], 2);
+		putc(' ');
 	}
 
 	while (1);

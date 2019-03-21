@@ -88,6 +88,8 @@
 #define PACKET_BUFFER_SIZE	1024
 #define PACKET_RBSIZE_BIT	NIC_RCTL_BSIZE_1024B
 
+extern unsigned char nic_mac_addr[6];
+
 void nic_init(void);
 unsigned int get_nic_reg_base(void);
 unsigned int get_nic_reg(unsigned short reg);

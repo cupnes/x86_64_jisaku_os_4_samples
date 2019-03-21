@@ -8,7 +8,7 @@
 #define TXDESC_NUM	8
 #define ALIGN_MARGIN	16
 
-unsigned char nic_mac_addr[6];
+unsigned char nic_mac_addr[6] = { 0 };
 
 struct __attribute__((packed)) rxdesc {
 	unsigned long long buffer_address;

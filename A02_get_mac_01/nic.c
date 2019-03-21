@@ -296,10 +296,9 @@ unsigned char send_frame(void *buf, unsigned short len)
 	set_nic_reg(NIC_REG_TDT, current_tx_idx);
 
 	/* 送信完了を待つ */
-	unsigned char send_status;
-	while (1) {
+	unsigned char send_status = 0;
+	while (!send_status)
 		send_status = cur_txdesc->sta & 0x0f;
-		if (send_status)
-			return send_status;
-	}
+
+	return send_status;
 }

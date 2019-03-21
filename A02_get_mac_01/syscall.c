@@ -4,6 +4,7 @@
 #include <fs.h>
 #include <proc.h>
 #include <sched.h>
+#include <nic.h>
 
 #define SYSCALL_INTR_NO	0x80
 
@@ -12,6 +13,8 @@ enum SYSCCALL_NO {
 	SYSCALL_OPEN,
 	SYSCALL_EXEC,
 	SYSCALL_ENQ_TASK,
+	SYSCALL_RCV_FRAME,
+	SYSCALL_SND_FRAME,
 	MAX_SYSCALL_NUM
 };
 
@@ -37,6 +40,14 @@ unsigned long long do_syscall_interrupt(
 
 	case SYSCALL_ENQ_TASK:
 		enq_task((struct file *)arg1);
+		break;
+
+	case SYSCALL_RCV_FRAME:
+		ret_val = receive_frame((void *)arg1);
+		break;
+
+	case SYSCALL_SND_FRAME:
+		ret_val = send_frame((void *)arg1, arg2);
 		break;
 	}
 
